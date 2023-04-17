@@ -64,7 +64,7 @@ void genera_sopa(sopa_t *s)
     s->lletres[65 + 2 * s->dim] = 'R'; s->encertades[65 + 2 * s->dim] = true;
     s->lletres[65 + 3 * s->dim] = 'B'; s->encertades[65 + 3 * s->dim] = true;
     s->lletres[65 + 4 * s->dim] = 'U'; s->encertades[65 + 4 * s->dim] = true;
-    s->lletres[65 + 5 * s->dim] = 'S'; s->encertades[65 + 5 * s->dim] = true;
+    s->lletres[65 + 5 * s->dim] = 'Z'; s->encertades[65 + 5 * s->dim] = true;
     s->lletres[65 + 6 * s->dim] = 'T'; s->encertades[65 + 6 * s->dim] = true;
 
 }
@@ -130,6 +130,7 @@ void mostra_sopa (sopa_t *s)
     }
 
 }
+
 
 int main() {
 
