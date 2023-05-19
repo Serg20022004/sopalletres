@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1683649680 source:c:\users\user\desktop\uni\fp\practica sopa\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<string.h>
+

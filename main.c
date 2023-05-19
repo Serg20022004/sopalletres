@@ -22,14 +22,39 @@ typedef struct
     paraula_t par[MAX_PARAULES];    // Les paraules
     int n_par;  // Nombre de paraules
     int n_encerts;    // Nombre de paraules encertades
+    FILE *paraules;  //Fitxer que conte paraules de la sopa de lletres
 } sopa_t;
 
 /* Aquesta funcio genera la sopa de lletres, a partir del fitxer i altres parametres */
-/* que ja decidireu. En aquest cas nomÃ©s l'emplena amb una SOPA d'EXEMPLE, es a dir */
-/* que haureu de fer la vostra prÃ²pia. */
+/* que ja decidireu. En aquest cas només l'emplena amb una SOPA d'EXEMPLE, es a dir */
+/* que haureu de fer la vostra pròpia. */
+int cmp_paraula_t(const void *a, const void *b)
+{
+    paraula_t *pa = (paraula_t *) a;
+    paraula_t *pb = (paraula_t *) b;
+    return strcmp(pa->ll, pb->ll);
+}
+
+void llegir_paraules(sopa_t *s)
+{
+    int i;
+
+    i=0;
+    s->paraules=fopen("paraules4.txt","r");
+
+    while(fgets(s->par[i].ll,MAX_LLETRES+1,s->paraules) != NULL){
+        s->par[i].ll[strcspn(s->par[i].ll, "\n")] = '\0';  // Elimina los '\n' sobrantes
+        i++;
+        s->n_par=i;
+    }
+    fclose(s->paraules);
+
+    qsort(s->par, s->n_par, sizeof(paraula_t), cmp_paraula_t);
+}
 void genera_sopa(sopa_t *s)
 {
-    s->dim = 30;    // Mida mÃ xima: 40 x 40
+    /*s->dim = 30;*/    // Mida màxima: 40 x 40
+    printf("Alo.\n");
     s->lletres = malloc(s->dim * s->dim * sizeof(char));   // Espai per a les lletres
     s->encertades = malloc(s->dim * s->dim * sizeof(char)); // Per saber si una lletra correspon a encert
     for (int i = 0; i < s->dim * s->dim; i++)
@@ -39,7 +64,7 @@ void genera_sopa(sopa_t *s)
         s->lletres[i] = 'A' + (rand() % ('Z'-'A' + 1));
     }
 
-    s->n_par = 5;
+    /*s->n_par = 5;
     strcpy(s->par[0].ll, "ALZINA");
     strcpy(s->par[1].ll, "ARBUST");
     strcpy(s->par[2].ll, "BOLET");
@@ -51,10 +76,10 @@ void genera_sopa(sopa_t *s)
     s->par[1].enc = true;
     s->par[2].enc = true;
     s->par[3].enc = false;
-    s->par[4].enc = false;
+    s->par[4].enc = false;*/
 
     // Ara posem un parell de paraules a la sopa com si s'haguessin encertat
-    s->lletres[5] = 'B'; s->encertades[5] = true;
+    /*s->lletres[5] = 'B'; s->encertades[5] = true;
     s->lletres[6] = 'O'; s->encertades[6] = true;
     s->lletres[7] = 'L'; s->encertades[7] = true;
     s->lletres[8] = 'E'; s->encertades[8] = true;
@@ -64,14 +89,174 @@ void genera_sopa(sopa_t *s)
     s->lletres[65 + 2 * s->dim] = 'R'; s->encertades[65 + 2 * s->dim] = true;
     s->lletres[65 + 3 * s->dim] = 'B'; s->encertades[65 + 3 * s->dim] = true;
     s->lletres[65 + 4 * s->dim] = 'U'; s->encertades[65 + 4 * s->dim] = true;
-    s->lletres[65 + 5 * s->dim] = 'Z'; s->encertades[65 + 5 * s->dim] = true;
-    s->lletres[65 + 6 * s->dim] = 'T'; s->encertades[65 + 6 * s->dim] = true;
+    s->lletres[65 + 5 * s->dim] = 'S'; s->encertades[65 + 5 * s->dim] = true;
+    s->lletres[65 + 6 * s->dim] = 'T'; s->encertades[65 + 6 * s->dim] = true;*/
 
 }
 
 
 /* Mostra la sopa de lletres pel terminal */
-/* En principi, NO HAURIEU DE MODIFICAR AQUEST CODI SI NO TOQUEU LES ESTRUCTURES DE DADES*/
+
+void ficar_paraules(sopa_t *s)
+{
+    int inici; /*Inici paraula*/
+    int lle;   /*Posicio lletres*/
+    int paraula;
+    int num_lletres;
+    int j;
+    int a;
+    int poscicio;
+    int comprovar;
+
+    srand(time(NULL));
+    paraula = 0;
+    a = 0;
+    lle = 0;
+    j = 1;
+    do
+    {
+        inici = rand() % (s->dim*s->dim) + 1;
+        j = rand() % 4+1;
+        switch (j)
+        {
+        case 1: /* Dreta*/
+            {
+                comprovar = 0;
+                poscicio = inici;
+                num_lletres = strlen(s->par[paraula].ll);
+                while(comprovar <  num_lletres)
+                {
+                    while((inici + num_lletres  > s->dim*s->dim) && (inici + num_lletres > s->dim+1))
+                          {
+                             inici = rand() % (s->dim*s->dim) + 1;
+                          }
+                    if(s->encertades[poscicio] == true)
+                        {
+                            inici = rand() % (s->dim*s->dim) + 1;
+                            poscicio = inici;
+                            comprovar = 0;
+                        }
+                    else
+                    {
+                        comprovar ++;
+                        poscicio ++;
+                    }
+                }
+                do
+                {
+                    s->lletres[inici + a] = s->par[paraula].ll[lle]; s->encertades[inici + a] = true;
+                    lle++;
+                    a ++;
+                }
+                while(num_lletres > a);
+                break;
+            }
+        case 2: /*Esquerra*/
+            {
+                comprovar = 0;
+                poscicio = inici;
+                num_lletres = strlen(s->par[paraula].ll);
+                while(comprovar < num_lletres)
+                {
+                    while((inici - num_lletres < num_lletres) && (inici - num_lletres < s->dim+1))
+                          {
+                             inici = rand() % (s->dim*s->dim) + 1;
+                          }
+                    if(s->encertades[poscicio] == true)
+                        {
+                            inici = rand() % (s->dim*s->dim) + 1;
+                            poscicio = inici;
+                            comprovar = 0;
+                        }
+                    else
+                    {
+                        comprovar ++;
+                        poscicio --;
+                    }
+                }
+                do
+                {
+                    s->lletres[inici - a] = s->par[paraula].ll[lle]; s->encertades[inici - a] = true;
+                    lle++;
+                    a ++;
+                }
+                while(num_lletres > a);
+                break;
+                }
+        case 3: /*Dal*/
+            {
+                    comprovar = 0;
+                    poscicio = 1;
+                    num_lletres = strlen(s->par[paraula].ll);
+                    while(comprovar < num_lletres)
+                    {
+                        while((inici + (num_lletres * s->dim)) > s->dim * s->dim)
+                              {
+                                 inici = rand() % (s->dim*s->dim) + 1;
+                              }
+                        if(s->encertades[inici + s->dim * poscicio] == true)
+                            {
+                                inici = rand() % (s->dim*s->dim) + 1;
+                                poscicio = 1;
+                                comprovar = 0;
+                            }
+                        else
+                        {
+                            comprovar ++;
+                            poscicio ++;
+                        }
+                    }
+                    a = 1;
+                    do
+                    {
+                        s->lletres[inici + (s->dim * a)] = s->par[paraula].ll[lle]; s->encertades[inici + s->dim * a] = true;
+                        a ++;
+                        lle ++;
+                    }
+                    while(num_lletres >= a);
+                    break;
+                }
+        case 4: /*Baix*/
+            {
+                comprovar = 0;
+                poscicio = 1;
+                num_lletres = strlen(s->par[paraula].ll);
+                while(comprovar < num_lletres)
+                {
+                    while(inici - (num_lletres * s->dim) <= 0)
+                          {
+                             inici = rand() % (s->dim*s->dim) + 1;
+                          }
+                    if(s->encertades[inici - s->dim * poscicio ] == true)
+                        {
+                            inici = rand() % (s->dim*s->dim) + 1;
+                            poscicio = 1;
+                            comprovar = 0;
+                        }
+                    else
+                    {
+                        comprovar ++;
+                        poscicio ++;
+
+                    }
+                }
+                a = 1;
+                do
+                {
+                        s->lletres[inici - s->dim * a] = s->par[paraula].ll[lle]; s->encertades[inici - s->dim * a] = true;
+                        a ++;
+                        lle ++;
+                }
+                while(num_lletres >= a);
+                break;
+            }
+        }
+        lle = 0;
+        paraula ++;
+        a = 0;
+    }
+    while(paraula < s->n_par);
+}
 void mostra_sopa (sopa_t *s)
 {
     // Mostrem els numeros de columna
@@ -130,15 +315,33 @@ void mostra_sopa (sopa_t *s)
     }
 
 }
-
+void benvinguda()
+{
+    printf("Us donem la benvinguda al joc de la sopa de lletres!.\n");
+    printf("Autors: Pau Fores Prats, Sergi ..., Genis Aragones Torralbo.\n");
+}
+void demanar_dimensio(sopa_t *s)
+{
+    printf("\n");
+    printf("De quan vols la sopa?(minim 10, maxim 40)\n");
+    scanf("%d", &s->dim);
+}
 
 int main() {
 
     sopa_t sopa;    // La sopa de lletres
+    benvinguda();
+    demanar_dimensio(&sopa);
+    llegir_paraules(&sopa);
+    if(sopa.paraules!=NULL){
 
-    genera_sopa(&sopa);     // La generem (exemple)
-
-    mostra_sopa(&sopa);      // La mostrem per pantalla
+        genera_sopa(&sopa);     // La generem (exemple)
+        ficar_paraules(&sopa);
+        mostra_sopa(&sopa);      // La mostrem per pantalla
+        printf ("\nEl nombre de paraules es de %d", sopa.n_par);
+    }
+    else
+        printf("L'arxiu de les paraules no existeix.");
 
     return 0;
 }
