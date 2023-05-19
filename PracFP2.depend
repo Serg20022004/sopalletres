@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1683649680 source:c:\users\user\desktop\uni\fp\practica sopa\main.c
+1682317145 source:c:\urv\fp2\practica\sopalletres\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
 	<string.h>
 
-1684508960 source:c:\urv\fp2\sopalletres\sopalletres\main.c
+1682317145 source:c:\urv\fp2\practica\sopalletres\maintest.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
