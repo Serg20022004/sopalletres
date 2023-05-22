@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1682317145 source:c:\urv\fp2\practica\sopalletres\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<string.h>
+
+1682317145 source:c:\urv\fp2\practica\sopalletres\maintest.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<string.h>
+
