@@ -312,7 +312,7 @@ void mostra_sopa (sopa_t *s)
     for (int i = 0; i < s->n_par; i++)
     {
         if (!s->par[i].enc)
-            printf("%s\n", s->par[i].ll);
+            printf("%s (%d)\n", s->par[i].ll, i);
     }
 
 }
@@ -339,7 +339,7 @@ void trobar_paraula (sopa_t *s)
 
     if (strcmp(resposta, "S") == 0 || strcmp(resposta, "s") == 0)
     {
-        printf("Entra quina paraula vols encertar:\n");
+        printf("Entra quina paraula vols encertar (Indicant el nombre a la dreta de la llista de paraules):\n");
         scanf("%d", &nparaula);
         printf("Entra la fila de la inicial de la paraula:\n");
         scanf("%d", &fila);
@@ -350,7 +350,7 @@ void trobar_paraula (sopa_t *s)
 
         // Comprovar si la paraula és correcta
         int posicio = (fila - 1) * s->dim + (columna - 1); // Calcula la posicio en la taula
-        int num_lletres = strlen(s->par[posicio].ll); // Calcula el num de lletres de la paraula en la posició indicada
+        int num_lletres = strlen(s->par[nparaula].ll); // Calcula el num de lletres de la paraula en la posició indicada
 
         if (direccio == 1) // Dreta
         {
@@ -366,7 +366,9 @@ void trobar_paraula (sopa_t *s)
 
                 if (posicio == (pos_final - num_lletres + 1))
                 {
+
                     s->par[nparaula].enc = true;
+                    printf("%d, %d\n", posicio, pos_final);
                     for (i = posicio; i <= pos_final; i++)
                     {
                         s->encertades[i] = true;
@@ -386,7 +388,7 @@ void trobar_paraula (sopa_t *s)
         }
         else if (direccio == -1) // Esquerra
         {
-            int pos_final = posicio - num_lletres - 1; // Calcula la posicio pos_final
+            int pos_final = posicio - (num_lletres - 1); // Calcula la posicio pos_final
             if (s->lletres[posicio] == s->par[nparaula].ll[0])
             {
                 int i;
@@ -396,9 +398,10 @@ void trobar_paraula (sopa_t *s)
                         break;
                 }
 
-                if (posicio == (pos_final + num_lletres + 1))
+                if (posicio == (pos_final + num_lletres - 1))
                 {
                     s->par[nparaula].enc = true;
+                    printf("%d, %d\n", posicio, pos_final);
                     for (i = posicio; i >= pos_final; i--)
                     {
                         s->encertades[i] = true;
@@ -416,7 +419,7 @@ void trobar_paraula (sopa_t *s)
                 printf("La paraula introduida es incorrecta. (-1)\n");
             }
         }
-        else if (direccio == 2) // Baix
+        else if (direccio == 2) // Baix.
         {
             int pos_final = posicio + (num_lletres - 1) * s->dim; // Calcula la posicio pos_final
               if (s->lletres[posicio] == s->par[nparaula].ll[0])
@@ -430,9 +433,9 @@ void trobar_paraula (sopa_t *s)
                 if (posicio == (pos_final - (num_lletres-1) * s->dim))
                 {
                     s->par[nparaula].enc = true;
-                    for (i = 1 ; i <= pos_final; i += s->dim)
+                    for (i = 0 ; i < num_lletres; i++)
                     {
-                        s->encertades[posicio + 1 * s->dim] = true;
+                        s->encertades[posicio + (i * s->dim)] = true;
                     }
                     printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
                     s->n_encerts += 1;
@@ -462,9 +465,10 @@ void trobar_paraula (sopa_t *s)
                 if (posicio == (pos_final + (num_lletres-1) * s->dim))
                 {
                     s->par[nparaula].enc = true;
-                    for (i = 1; i >= pos_final; i -= s->dim)
+                    printf("%d, %d\n", posicio, pos_final);
+                    for (i = 0 ; i < num_lletres; i++)
                     {
-                        s->encertades[posicio - i * s->dim] = true;
+                        s->encertades[posicio - (i * s->dim)] = true;
                     }
                     printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
                     s->n_encerts += 1;
@@ -510,7 +514,7 @@ int main() {
             printf("\nEl nombre de paraules es de %d", sopa.n_par);
             trobar_paraula(&sopa);
         } while (!(sopa.n_encerts == sopa.n_par));
-
+        mostra_sopa(&sopa);
         printf("\nHas trobat totes les paraules! Felicitats!\n");
     }
     else
