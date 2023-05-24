@@ -12,6 +12,7 @@ typedef struct
 {
     char ll[MAX_LLETRES + 1];   // Lletres de la paraula (comptem centinella)
     bool enc;   // La paraula s'ha encertat
+    int pos;    // La posicio inicial de la paraula
 } paraula_t;
 
 typedef struct
@@ -143,6 +144,7 @@ void ficar_paraules(sopa_t *s)
                         poscicio ++;
                     }
                 }
+                s->par[paraula].pos = inici;
                 do
                 {
                     s->lletres[inici + a] = s->par[paraula].ll[lle]; /*s->encertades[inici + a] = true;*/
@@ -175,6 +177,7 @@ void ficar_paraules(sopa_t *s)
                         poscicio --;
                     }
                 }
+                s->par[paraula].pos = inici;
                 do
                 {
                     s->lletres[inici - a] = s->par[paraula].ll[lle]; /*s->encertades[inici - a] = true;*/
@@ -207,6 +210,7 @@ void ficar_paraules(sopa_t *s)
                             poscicio ++;
                         }
                     }
+                    s->par[paraula].pos = inici;
                     a = 1;
                     do
                     {
@@ -241,6 +245,7 @@ void ficar_paraules(sopa_t *s)
 
                     }
                 }
+                s->par[paraula].pos = inici;
                 a = 1;
                 do
                 {
@@ -354,19 +359,12 @@ void trobar_paraula (sopa_t *s)
 
         if (direccio == 1) // Dreta
         {
-            int pos_final = posicio + num_lletres - 1; // Calcula la posicio pos_final
+            int pos_final = posicio + num_lletres - 1; // Calcula la posicio final
             if (s->lletres[posicio] == s->par[nparaula].ll[0])
             {
                 int i;
-                for (i = posicio; i <= pos_final; i++)
-                {
-                    if (s->lletres[i] != s->par[nparaula].ll[i - posicio])
-                        break;
-                }
-
                 if (posicio == (pos_final - num_lletres + 1))
                 {
-
                     s->par[nparaula].enc = true;
                     printf("%d, %d\n", posicio, pos_final);
                     for (i = posicio; i <= pos_final; i++)
@@ -388,16 +386,10 @@ void trobar_paraula (sopa_t *s)
         }
         else if (direccio == -1) // Esquerra
         {
-            int pos_final = posicio - (num_lletres - 1); // Calcula la posicio pos_final
+            int pos_final = posicio - (num_lletres - 1); // Calcula la posicio final
             if (s->lletres[posicio] == s->par[nparaula].ll[0])
             {
                 int i;
-                for (i = posicio; i >= pos_final; i--)
-                {
-                    if (s->lletres[i] != s->par[nparaula].ll[posicio - i])
-                        break;
-                }
-
                 if (posicio == (pos_final + num_lletres - 1))
                 {
                     s->par[nparaula].enc = true;
@@ -421,15 +413,10 @@ void trobar_paraula (sopa_t *s)
         }
         else if (direccio == 2) // Baix.
         {
-            int pos_final = posicio + (num_lletres - 1) * s->dim; // Calcula la posicio pos_final
+            int pos_final = posicio + (num_lletres - 1) * s->dim; // Calcula la posicio final
               if (s->lletres[posicio] == s->par[nparaula].ll[0])
             {
                 int i;
-                for (i = posicio; i <= pos_final; i += s->dim)
-                {
-                    if (s->lletres[i] != s->par[nparaula].ll[(i - posicio) / s->dim])
-                        break;
-                }
                 if (posicio == (pos_final - (num_lletres-1) * s->dim))
                 {
                     s->par[nparaula].enc = true;
@@ -452,16 +439,10 @@ void trobar_paraula (sopa_t *s)
         }
         else if (direccio == -2) // Dalt
         {
-            int pos_final = posicio - (num_lletres - 1) * s->dim; // Calcula la posicio pos_final
+            int pos_final = posicio - (num_lletres - 1) * s->dim; // Calcula la posicio final
             if (s->lletres[posicio] == s->par[nparaula].ll[0])
             {
                 int i;
-                for (i = posicio; i >= pos_final; i -= s->dim)
-                {
-                    if (s->lletres[i] != s->par[nparaula].ll[posicio - i])
-                       break;
-                }
-
                 if (posicio == (pos_final + (num_lletres-1) * s->dim))
                 {
                     s->par[nparaula].enc = true;
@@ -490,7 +471,34 @@ void trobar_paraula (sopa_t *s)
     }
     else if (strcmp(resposta, "N") == 0 || strcmp(resposta, "n") == 0)
     {
-        printf("No has trobat cap paraula en aquest torn.\n");
+        printf("No has trobat cap paraula en aquest torn. Et rendeixes o continues? (Introduir RENDICIO/CONTINUAR).\n");
+        scanf("%s", resposta);
+        if (strcmp(resposta, "CONTINUAR") == 0 || strcmp(resposta, "continuar") == 0)
+        {
+            printf("\n");
+        }
+
+        else if (strcmp(resposta, "RENDICIO") == 0 || strcmp(resposta, "rendicio") == 0)
+        {
+            for (int i = 0; i < s->n_par; i++)
+            {
+                s->par[i].enc = true;
+                int num_lletres = strlen(s->par[i].ll);
+                int pos_inicial = s->par[i].pos;
+                printf("%d\n", pos_inicial);
+
+                for (int j = 0; j < num_lletres; j++)
+                {
+                    int posicio = pos_inicial + j;
+                    s->encertades[posicio] =  true; // Direccio 1 (dreta)
+                    s->encertades[posicio - j] =  true; // Direccio -1 (esquerra)
+                    s->encertades[posicio + j * s->dim] =  true; // Direccio 2 (baix)
+                    s->encertades[posicio - j * s->dim] =  true; // Direccio -2 (dalt)
+                }
+            }
+            s->n_encerts = s->n_par;
+        }
+
     }
     else
     {
