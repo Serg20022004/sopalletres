@@ -267,6 +267,11 @@ void ficar_paraules(sopa_t *s)
         a = 0;
     }
     while(paraula < s->n_par);
+
+    for (int i = 0; i < s->n_par; i++)
+    {
+        s->par[i].enc = false;
+    }
 }
 
 void mostra_sopa (sopa_t *s)
@@ -372,7 +377,7 @@ void trobar_paraula (sopa_t *s)
                 if (posicio == (pos_final - num_lletres + 1))
                 {
                     s->par[nparaula].enc = true;
-                    printf("%d, %d\n", posicio, pos_final);
+                    // printf("%d, %d\n", posicio, pos_final); //Comprovar posicio i posicio final
                     for (i = posicio; i <= pos_final; i++)
                     {
                         s->encertades[i] = true;
@@ -399,7 +404,6 @@ void trobar_paraula (sopa_t *s)
                 if (posicio == (pos_final + num_lletres - 1))
                 {
                     s->par[nparaula].enc = true;
-                    printf("%d, %d\n", posicio, pos_final);
                     for (i = posicio; i >= pos_final; i--)
                     {
                         s->encertades[i] = true;
@@ -452,7 +456,6 @@ void trobar_paraula (sopa_t *s)
                 if (posicio == (pos_final + (num_lletres-1) * s->dim))
                 {
                     s->par[nparaula].enc = true;
-                    printf("%d, %d\n", posicio, pos_final);
                     for (i = 0 ; i < num_lletres; i++)
                     {
                         s->encertades[posicio - (i * s->dim)] = true;
@@ -485,38 +488,38 @@ void trobar_paraula (sopa_t *s)
         }
 
         else if (strcmp(resposta, "RENDICIO") == 0 || strcmp(resposta, "rendicio") == 0)
-{
-    for (int i = 0; i < s->n_par; i++)
-    {
-        s->par[i].enc = true;
-        int num_lletres = strlen(s->par[i].ll);
-        int pos_inicial = s->par[i].pos;
-
-        for (int j = 0; j < num_lletres; j++)
         {
-            int posicio;
-            switch(s->par[i].direccio)
+            for (int i = 0; i < s->n_par; i++)
             {
-                case 1: // Direccio 1 (dreta)
-                    posicio = pos_inicial + j;
-                    break;
-                case 2: // Direccio -1 (esquerra)
-                    posicio = pos_inicial - j;
-                    break;
-                case 3: // Direccio 2 (baix)
-                    posicio = pos_inicial + (j * s->dim);
-                    break;
-                case 4: // Direccio -2 (dalt)
-                    posicio = pos_inicial - (j * s->dim);
-                    break;
+                s->par[i].enc = true;
+                int num_lletres = strlen(s->par[i].ll);
+                int pos_inicial = s->par[i].pos;
+
+                for (int j = 0; j < num_lletres; j++)
+                {
+                    int posicio;
+                    switch(s->par[i].direccio)
+                    {
+                        case 1: // Direccio 1 (dreta)
+                            posicio = pos_inicial + j;
+                            break;
+                        case 2: // Direccio -1 (esquerra)
+                            posicio = pos_inicial - j;
+                            break;
+                        case 3: // Direccio 2 (baix)
+                            posicio = pos_inicial + (j * s->dim);
+                            break;
+                        case 4: // Direccio -2 (dalt)
+                            posicio = pos_inicial - (j * s->dim);
+                            break;
+                    }
+                    if (posicio >= 0 && posicio < s->dim * s->dim) {
+                        s->encertades[posicio] = true;
+                    }
+                }
             }
-            if (posicio >= 0 && posicio < s->dim * s->dim) {
-                s->encertades[posicio] = true;
-            }
+            s->n_encerts = s->n_par;
         }
-    }
-    s->n_encerts = s->n_par;
-}
 
     }
     else
