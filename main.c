@@ -13,6 +13,7 @@ typedef struct
     char ll[MAX_LLETRES + 1];   // Lletres de la paraula (comptem centinella)
     bool enc;   // La paraula s'ha encertat
     int pos;    // La posicio inicial de la paraula
+    int direccio; // La direccio de la paraula
 } paraula_t;
 
 typedef struct
@@ -144,7 +145,8 @@ void ficar_paraules(sopa_t *s)
                         poscicio ++;
                     }
                 }
-                s->par[paraula].pos = inici;
+                s->par[paraula].pos = inici; // Guarda la posició inicial d'aquesta paraula
+                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
                 do
                 {
                     s->lletres[inici + a] = s->par[paraula].ll[lle]; /*s->encertades[inici + a] = true;*/
@@ -177,7 +179,8 @@ void ficar_paraules(sopa_t *s)
                         poscicio --;
                     }
                 }
-                s->par[paraula].pos = inici;
+                s->par[paraula].pos = inici; // Guarda la posició inicial d'aquesta paraula
+                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
                 do
                 {
                     s->lletres[inici - a] = s->par[paraula].ll[lle]; /*s->encertades[inici - a] = true;*/
@@ -210,7 +213,8 @@ void ficar_paraules(sopa_t *s)
                             poscicio ++;
                         }
                     }
-                    s->par[paraula].pos = inici;
+                    s->par[paraula].pos = inici + s->dim; // Guarda la posició inicial d'aquesta paraula
+                    s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
                     a = 1;
                     do
                     {
@@ -245,7 +249,8 @@ void ficar_paraules(sopa_t *s)
 
                     }
                 }
-                s->par[paraula].pos = inici;
+                s->par[paraula].pos = inici - s->dim; // Guarda la posició inicial d'aquesta paraula
+                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
                 a = 1;
                 do
                 {
@@ -263,6 +268,7 @@ void ficar_paraules(sopa_t *s)
     }
     while(paraula < s->n_par);
 }
+
 void mostra_sopa (sopa_t *s)
 {
     // Mostrem els numeros de columna
@@ -479,25 +485,38 @@ void trobar_paraula (sopa_t *s)
         }
 
         else if (strcmp(resposta, "RENDICIO") == 0 || strcmp(resposta, "rendicio") == 0)
-        {
-            for (int i = 0; i < s->n_par; i++)
-            {
-                s->par[i].enc = true;
-                int num_lletres = strlen(s->par[i].ll);
-                int pos_inicial = s->par[i].pos;
-                printf("%d\n", pos_inicial);
+{
+    for (int i = 0; i < s->n_par; i++)
+    {
+        s->par[i].enc = true;
+        int num_lletres = strlen(s->par[i].ll);
+        int pos_inicial = s->par[i].pos;
 
-                for (int j = 0; j < num_lletres; j++)
-                {
-                    int posicio = pos_inicial + j;
-                    s->encertades[posicio] =  true; // Direccio 1 (dreta)
-                    s->encertades[posicio - j] =  true; // Direccio -1 (esquerra)
-                    s->encertades[posicio + j * s->dim] =  true; // Direccio 2 (baix)
-                    s->encertades[posicio - j * s->dim] =  true; // Direccio -2 (dalt)
-                }
+        for (int j = 0; j < num_lletres; j++)
+        {
+            int posicio;
+            switch(s->par[i].direccio)
+            {
+                case 1: // Direccio 1 (dreta)
+                    posicio = pos_inicial + j;
+                    break;
+                case 2: // Direccio -1 (esquerra)
+                    posicio = pos_inicial - j;
+                    break;
+                case 3: // Direccio 2 (baix)
+                    posicio = pos_inicial + (j * s->dim);
+                    break;
+                case 4: // Direccio -2 (dalt)
+                    posicio = pos_inicial - (j * s->dim);
+                    break;
             }
-            s->n_encerts = s->n_par;
+            if (posicio >= 0 && posicio < s->dim * s->dim) {
+                s->encertades[posicio] = true;
+            }
         }
+    }
+    s->n_encerts = s->n_par;
+}
 
     }
     else
