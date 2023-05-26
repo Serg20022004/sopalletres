@@ -352,16 +352,13 @@ void demanar_dimensio(sopa_t *s)
     }while(sscanf(input, "%d", &s->dim) != 1 || s->dim < 10 || s->dim > 40);
 }
 
-void limpiar_input(char* input_jugador)
-{
-    input_jugador[strcspn(input_jugador, "\n")] = '\0';
-}
-
 void limpiar_buffer()
 {
     int c;
     while ((c = getchar() != '\n' && c != EOF)){}
 }
+
+
 
 void trobar_paraula (sopa_t *s)
 {
@@ -386,12 +383,10 @@ void trobar_paraula (sopa_t *s)
 
         printf("Entra quina paraula vols encertar (Indicant el nombre a la dreta de la llista de paraules):\n");
         fgets(input, 50, stdin);
-        limpiar_input(input);
         while(sscanf(input, "%d", &nparaula) != 1 || nparaula < 0 || nparaula >= (s->n_par-1)) // Si sscanf no pot transformar correctament l'input a un nombre, o si nparaula és menor a 0 o major al nombre de paraules, dona error.
         {
             printf("El valor indicat es incorrecte. Introdueix un nombre corresponent a una paraula de la llista.\n");
             fgets(input, 50, stdin);
-            limpiar_input(input);
         };
 
         printf("Entra la fila de la inicial de la paraula:\n");
