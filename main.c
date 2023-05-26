@@ -339,11 +339,29 @@ void benvinguda()
 }
 void demanar_dimensio(sopa_t *s)
 {
+    char input[50];
     printf("\n");
     printf("De quan vols la sopa?(minim 10, maxim 40)\n");
-    scanf("%d", &s->dim);
+    do
+    {
+        fgets(input, 50, stdin);
+        if(sscanf(input, "%d", &s->dim) != 1 || s->dim < 10 || s->dim > 40)
+        {
+            printf("El valor indicat és incorrecte. Introdueix un nombre de 10 a 40.\n");
+        }
+    }while(sscanf(input, "%d", &s->dim) != 1 || s->dim < 10 || s->dim > 40);
 }
 
+void limpiar_input(char* input_jugador)
+{
+    input_jugador[strcspn(input_jugador, "\n")] = '\0';
+}
+
+void limpiar_buffer()
+{
+    int c;
+    while ((c = getchar() != '\n' && c != EOF)){}
+}
 
 void trobar_paraula (sopa_t *s)
 {
@@ -352,17 +370,53 @@ void trobar_paraula (sopa_t *s)
 
     printf("\nEs el teu torn. Has trobat alguna paraula? (S/N)\n");
     scanf("%s", resposta);
+    limpiar_buffer();
+    while((strcmp(resposta, "S") != 0 && strcmp(resposta, "s") != 0) && (strcmp(resposta, "N") != 0 && strcmp(resposta, "n") != 0))
+    {
+        printf("Resposta invalida.\n");
+        printf("Torna a introduir la teva resposta. Has trobat alguna paraula? (S/N)\n");
+        scanf("%s", resposta);
+        limpiar_buffer();
+    }
+
 
     if (strcmp(resposta, "S") == 0 || strcmp(resposta, "s") == 0)
     {
+        char input[50] = "";
+
         printf("Entra quina paraula vols encertar (Indicant el nombre a la dreta de la llista de paraules):\n");
-        scanf("%d", &nparaula);
+        fgets(input, 50, stdin);
+        limpiar_input(input);
+        while(sscanf(input, "%d", &nparaula) != 1 || nparaula < 0 || nparaula >= (s->n_par-1)) // Si sscanf no pot transformar correctament l'input a un nombre, o si nparaula és menor a 0 o major al nombre de paraules, dona error.
+        {
+            printf("El valor indicat es incorrecte. Introdueix un nombre corresponent a una paraula de la llista.\n");
+            fgets(input, 50, stdin);
+            limpiar_input(input);
+        };
+
         printf("Entra la fila de la inicial de la paraula:\n");
-        scanf("%d", &fila);
+        fgets(input, 50, stdin);
+        while(sscanf(input, "%d", &fila) != 1 || fila < 1 || fila > s->dim)
+        {
+            printf("El valor indicat es incorrecte. Introdueix un nombre de 1 a %d\n", s->dim);
+            fgets(input, 50, stdin);
+        };
+
         printf("Entra la columna de la inicial de la paraula:\n");
-        scanf("%d", &columna);
+        fgets(input, 50, stdin);
+        while(sscanf(input, "%d", &columna) != 1 || columna < 1 || columna > s->dim)
+        {
+            printf("El valor indicat es incorrecte. Introdueix un nombre de 1 a %d\n", s->dim);
+            fgets(input, 50, stdin);
+        };
+
         printf("Entra la direccio de la paraula (1: dreta, -1: esquerra, 2: baix, -2: dalt):\n");
-        scanf("%d", &direccio);
+        fgets(input, 50, stdin);
+        while(sscanf(input, "%d", &direccio) != 1 || direccio != 1 && direccio != -1 && direccio != 2 && direccio != -2)
+        {
+            printf("El valor indicat es incorrecte. Introdueix una direccio valida (1: dreta, -1: esquerra, 2: baix, -2: dalt):\n");
+            fgets(input, 50, stdin);
+        };
 
         // Comprovar si la paraula és correcta
         int posicio = (fila - 1) * s->dim + (columna - 1); // Calcula la posicio en la taula
@@ -480,8 +534,16 @@ void trobar_paraula (sopa_t *s)
     }
     else if (strcmp(resposta, "N") == 0 || strcmp(resposta, "n") == 0)
     {
+
         printf("No has trobat cap paraula en aquest torn. Et rendeixes o continues? (Introduir RENDICIO/CONTINUAR).\n");
         scanf("%s", resposta);
+        while((strcmp(resposta, "CONTINAR") != 0 && strcmp(resposta, "continuar") != 0) && (strcmp(resposta, "RENDICIO") != 0 && strcmp(resposta, "rendicio") != 0))
+        {
+            printf("Resposta invalida.\n");
+            printf("Torna a introduir la teva resposta. Et rendeixes o continues? (Introduir RENDICIO/CONTINUAR).\n");
+            scanf("%s", resposta);
+            limpiar_buffer();
+        }
         if (strcmp(resposta, "CONTINUAR") == 0 || strcmp(resposta, "continuar") == 0)
         {
             printf("\n");
@@ -521,10 +583,6 @@ void trobar_paraula (sopa_t *s)
             s->n_encerts = s->n_par;
         }
 
-    }
-    else
-    {
-        printf("Resposta invalida.\n");
     }
 }
 
