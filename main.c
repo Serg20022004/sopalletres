@@ -313,7 +313,11 @@ int validar_entrada(const char* missatge, int minim, int maxim, const char* erro
         fgets(input, 50, stdin);
         if (sscanf(input, "%d", &valor) == 1 && valor >= minim && valor <= maxim) {
             valid = true;
-        } else {
+        } else if (minim == 1){
+            printf("%s %d\n", error, maxim);
+        }
+        else if (minim == -2)
+        {
             printf("%s\n", error);
         }
     }
@@ -342,8 +346,8 @@ void trobar_paraula(sopa_t *s) {
     if (strcmp(resposta, "S") == 0 || strcmp(resposta, "s") == 0) {
         char input[50] = "";
 
-        fila = validar_entrada("Entra la fila de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a %d");
-        columna = validar_entrada("Entra la columna de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a %d");
+        fila = validar_entrada("Entra la fila de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a");
+        columna = validar_entrada("Entra la columna de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a");
         direccio = validar_entrada("Entra la direccio (1: dreta, -1: esquerra, 2: baix, -2: dalt):", -2, 2, "El valor indicat es incorrecte. Introdueix una direccio valida (1: dreta, -1: esquerra, 2: baix, -2: dalt)");
 
 
