@@ -109,12 +109,10 @@ void ficar_paraules(sopa_t *s)
     int num_lletres;
     int j;
     int posicio;
-    int comprovar;
     int intent;
     int solapat;
 
     srand(time(NULL));
-    comprovar = 0;
     intent = 0;
 
     for (int paraula = 0; paraula < s->n_par; paraula++)
