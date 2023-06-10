@@ -21,6 +21,7 @@ typedef struct
     int dim;        // Nombre de files = nombre de columnes
     char *lletres;  // Taula amb les lletres
     bool *encertades;   // Les lletres son d'una paraula que s'ha encertat
+    bool *insertades;   // Si la paraula ja ha estat insertada.
     paraula_t par[MAX_PARAULES];    // Les paraules
     int n_par;  // Nombre de paraules
     int n_encerts;    // Nombre de paraules encertades
@@ -59,9 +60,11 @@ void genera_sopa(sopa_t *s)
     printf("Alo.\n");
     s->lletres = malloc(s->dim * s->dim * sizeof(char));   // Espai per a les lletres
     s->encertades = malloc(s->dim * s->dim * sizeof(char)); // Per saber si una lletra correspon a encert
+    s->insertades = malloc(s->dim * s->dim * sizeof(char));
     for (int i = 0; i < s->dim * s->dim; i++)
     {
         s->encertades[i] = false;
+        s->insertades[i] = false;
         // Generem una lletra aleatoriament
         s->lletres[i] = 'A' + (rand() % ('Z'-'A' + 1));
     }
@@ -102,177 +105,119 @@ void genera_sopa(sopa_t *s)
 
 void ficar_paraules(sopa_t *s)
 {
-    int inici; /*Inici paraula*/
-    int lle;   /*Posicio lletres*/
-    int paraula;
+    int inici;
     int num_lletres;
     int j;
-    int a;
-    int poscicio;
+    int posicio;
     int comprovar;
+    int intent;
+    int solapat;
 
     srand(time(NULL));
-    paraula = 0;
-    a = 0;
-    lle = 0;
-    j = 1;
-    do
-    {
-        inici = rand() % (s->dim*s->dim) + 1;
-        j = rand() % 4+1;
-        switch (j)
-        {
-        case 1: /* Dreta*/
-            {
-                comprovar = 0;
-                poscicio = inici;
-                num_lletres = strlen(s->par[paraula].ll);
-                while(comprovar <  num_lletres)
-                {
-                    while((inici + num_lletres  > s->dim*s->dim) && (inici + num_lletres > s->dim+1))
-                          {
-                             inici = rand() % (s->dim*s->dim) + 1;
-                          }
-                    if(s->encertades[poscicio] == true)
-                        {
-                            inici = rand() % (s->dim*s->dim) + 1;
-                            poscicio = inici;
-                            comprovar = 0;
-                        }
-                    else
-                    {
-                        comprovar ++;
-                        poscicio ++;
-                    }
-                }
-                s->par[paraula].pos = inici; // Guarda la posició inicial d'aquesta paraula
-                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
-                do
-                {
-                    s->lletres[inici + a] = s->par[paraula].ll[lle]; /*s->encertades[inici + a] = true;*/
-                    lle++;
-                    a ++;
-                }
-                while(num_lletres > a);
-                break;
-            }
-        case 2: /*Esquerra*/
-            {
-                comprovar = 0;
-                poscicio = inici;
-                num_lletres = strlen(s->par[paraula].ll);
-                while(comprovar < num_lletres)
-                {
-                    while((inici - num_lletres < num_lletres) && (inici - num_lletres < s->dim+1))
-                          {
-                             inici = rand() % (s->dim*s->dim) + 1;
-                          }
-                    if(s->encertades[poscicio] == true)
-                        {
-                            inici = rand() % (s->dim*s->dim) + 1;
-                            poscicio = inici;
-                            comprovar = 0;
-                        }
-                    else
-                    {
-                        comprovar ++;
-                        poscicio --;
-                    }
-                }
-                s->par[paraula].pos = inici; // Guarda la posició inicial d'aquesta paraula
-                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
-                do
-                {
-                    s->lletres[inici - a] = s->par[paraula].ll[lle]; /*s->encertades[inici - a] = true;*/
-                    lle++;
-                    a ++;
-                }
-                while(num_lletres > a);
-                break;
-                }
-        case 3: /*Dalt*/
-            {
-                    comprovar = 0;
-                    poscicio = 1;
-                    num_lletres = strlen(s->par[paraula].ll);
-                    while(comprovar < num_lletres)
-                    {
-                        while((inici + (num_lletres * s->dim)) > s->dim * s->dim)
-                              {
-                                 inici = rand() % (s->dim*s->dim) + 1;
-                              }
-                        if(s->encertades[inici + s->dim * poscicio] == true)
-                            {
-                                inici = rand() % (s->dim*s->dim) + 1;
-                                poscicio = 1;
-                                comprovar = 0;
-                            }
-                        else
-                        {
-                            comprovar ++;
-                            poscicio ++;
-                        }
-                    }
-                    s->par[paraula].pos = inici + s->dim; // Guarda la posició inicial d'aquesta paraula
-                    s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
-                    a = 1;
-                    do
-                    {
-                        s->lletres[inici + (s->dim * a)] = s->par[paraula].ll[lle]; /*s->encertades[inici + s->dim * a] = true;*/
-                        a ++;
-                        lle ++;
-                    }
-                    while(num_lletres >= a);
-                    break;
-                }
-        case 4: /*Baix*/
-            {
-                comprovar = 0;
-                poscicio = 1;
-                num_lletres = strlen(s->par[paraula].ll);
-                while(comprovar < num_lletres)
-                {
-                    while(inici - (num_lletres * s->dim) <= 0)
-                          {
-                             inici = rand() % (s->dim*s->dim) + 1;
-                          }
-                    if(s->encertades[inici - s->dim * poscicio ] == true)
-                        {
-                            inici = rand() % (s->dim*s->dim) + 1;
-                            poscicio = 1;
-                            comprovar = 0;
-                        }
-                    else
-                    {
-                        comprovar ++;
-                        poscicio ++;
+    comprovar = 0;
+    intent = 0;
 
+    for (int paraula = 0; paraula < s->n_par; paraula++)
+    {
+        num_lletres = strlen(s->par[paraula].ll);
+        solapat = 1;
+
+        while (solapat)
+        {
+            intent++;
+            if (intent > 1000) {
+                printf("Error: No es pot generar la sopa de lletres.\n"); // Si es superen els 1000 intents per a re-insertar una paraula sense que solapi, dona error.
+                return;
+            }
+
+            solapat = 0;
+            inici = rand() % (s->dim * s->dim) + 1;
+            j = rand() % 4 + 1;
+            bool sortir = false;
+            switch (j)
+            {
+                case 1: /* Dreta */
+                    posicio = inici;
+                    for (int a = 0; a < num_lletres && !sortir; a++)
+                    {
+                        if ((posicio + a) % s->dim == 0 || s->insertades[posicio + a] == true)
+                        {
+                            solapat = 1;
+                            sortir = true;
+                        }
                     }
-                }
-                s->par[paraula].pos = inici - s->dim; // Guarda la posició inicial d'aquesta paraula
-                s->par[paraula].direccio = j; // Guarda la direccio d'aquesta paraula
-                a = 1;
-                do
+                    break;
+
+                case 2: /* Esquerra */
+                    posicio = inici;
+                    for (int a = 0; a < num_lletres && !sortir; a++)
+                    {
+                        if ((posicio - a) % s->dim == (s->dim - 1) || s->insertades[posicio - a] == true)
+                        {
+                            solapat = 1;
+                            sortir = true;
+                        }
+                    }
+                    break;
+
+                case 3: /* Dalt */
+                    posicio = inici;
+                    for (int a = 0; a < num_lletres && !sortir; a++)
+                    {
+                        if (posicio + (a * s->dim) >= (s->dim * s->dim) || s->insertades[posicio + (a * s->dim)] == true)
+                        {
+                            solapat = 1;
+                            sortir = true;
+                        }
+                    }
+                    break;
+
+                case 4: /* Baix */
+                    posicio = inici;
+                    for (int a = 0; a < num_lletres && !sortir; a++)
+                    {
+                        if (posicio - (a * s->dim) < 1 || s->insertades[posicio - (a * s->dim)] == true)
+                        {
+                            solapat = 1;
+                            sortir = true;
+                        }
+                    }
+                    break;
+            }
+
+            if (!solapat)
+            {
+                for (int a = 0; a < num_lletres; a++)
                 {
-                        s->lletres[inici - s->dim * a] = s->par[paraula].ll[lle]; /*s->encertades[inici - s->dim * a] = true;*/
-                        a ++;
-                        lle ++;
+                    int index;
+                    switch (j)
+                    {
+                        case 1: /* Dreta */
+                            index = inici + a;
+                            break;
+                        case 2: /* Esquerra */
+                            index = inici - a;
+                            break;
+                        case 3: /* Dalt */
+                            index = inici + (a * s->dim);
+                            break;
+                        case 4: /* Baix */
+                            index = inici - (a * s->dim);
+                            break;
+                    }
+
+                    s->lletres[index] = s->par[paraula].ll[a];
+                    s->insertades[index] = true;
                 }
-                while(num_lletres >= a);
-                break;
+
+                s->par[paraula].pos = inici;
+                s->par[paraula].direccio = j;
             }
         }
-        lle = 0;
-        paraula ++;
-        a = 0;
-    }
-    while(paraula < s->n_par);
-
-    for (int i = 0; i < s->n_par; i++)
-    {
-        s->par[i].enc = false;
     }
 }
+
+
 
 void mostra_sopa (sopa_t *s)
 {
@@ -347,7 +292,7 @@ void demanar_dimensio(sopa_t *s)
         fgets(input, 50, stdin);
         if(sscanf(input, "%d", &s->dim) != 1 || s->dim < 10 || s->dim > 40)
         {
-            printf("El valor indicat és incorrecte. Introdueix un nombre de 10 a 40.\n");
+            printf("El valor indicat es incorrecte. Introdueix un nombre de 10 a 40.\n");
         }
     }while(sscanf(input, "%d", &s->dim) != 1 || s->dim < 10 || s->dim > 40);
 }
@@ -358,173 +303,109 @@ void limpiar_buffer()
     while ((c = getchar() != '\n' && c != EOF)){}
 }
 
+int validar_entrada(const char* missatge, int minim, int maxim, const char* error) { // Funció per a validar els inputs del jugador (principalment per a no tenir tant de text repetit a la funció de trobar_paraula)
+    int valor;
+    char input[50];
+    bool valid = false;
+
+    while (!valid) {
+        printf("%s\n", missatge);
+        fgets(input, 50, stdin);
+        if (sscanf(input, "%d", &valor) == 1 && valor >= minim && valor <= maxim) {
+            valid = true;
+        } else {
+            printf("%s\n", error);
+        }
+    }
+
+    return valor;
+}
 
 
-void trobar_paraula (sopa_t *s)
-{
-    int nparaula,fila, columna, direccio;
+
+
+void trobar_paraula(sopa_t *s) {
+    int fila, columna, direccio;
     char resposta[10];
+    bool trobat = false;
 
     printf("\nEs el teu torn. Has trobat alguna paraula? (S/N)\n");
     scanf("%s", resposta);
     limpiar_buffer();
-    while((strcmp(resposta, "S") != 0 && strcmp(resposta, "s") != 0) && (strcmp(resposta, "N") != 0 && strcmp(resposta, "n") != 0))
-    {
+    while ((strcmp(resposta, "S") != 0 && strcmp(resposta, "s") != 0) && (strcmp(resposta, "N") != 0 && strcmp(resposta, "n") != 0)) {
         printf("Resposta invalida.\n");
         printf("Torna a introduir la teva resposta. Has trobat alguna paraula? (S/N)\n");
         scanf("%s", resposta);
         limpiar_buffer();
     }
 
-
-    if (strcmp(resposta, "S") == 0 || strcmp(resposta, "s") == 0)
-    {
+    if (strcmp(resposta, "S") == 0 || strcmp(resposta, "s") == 0) {
         char input[50] = "";
 
-        printf("Entra quina paraula vols encertar (Indicant el nombre a la dreta de la llista de paraules):\n");
-        fgets(input, 50, stdin);
-        while(sscanf(input, "%d", &nparaula) != 1 || nparaula < 0 || nparaula >= (s->n_par-1)) // Si sscanf no pot transformar correctament l'input a un nombre, o si nparaula és menor a 0 o major al nombre de paraules, dona error.
-        {
-            printf("El valor indicat es incorrecte. Introdueix un nombre corresponent a una paraula de la llista.\n");
-            fgets(input, 50, stdin);
-        };
+        fila = validar_entrada("Entra la fila de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a %d");
+        columna = validar_entrada("Entra la columna de la inicial de la paraula:", 1, s->dim, "El valor indicat es incorrecte. Introdueix un nombre de 1 a %d");
+        direccio = validar_entrada("Entra la direccio (1: dreta, -1: esquerra, 2: baix, -2: dalt):", -2, 2, "El valor indicat es incorrecte. Introdueix una direccio valida (1: dreta, -1: esquerra, 2: baix, -2: dalt)");
 
-        printf("Entra la fila de la inicial de la paraula:\n");
-        fgets(input, 50, stdin);
-        while(sscanf(input, "%d", &fila) != 1 || fila < 1 || fila > s->dim)
-        {
-            printf("El valor indicat es incorrecte. Introdueix un nombre de 1 a %d\n", s->dim);
-            fgets(input, 50, stdin);
-        };
 
-        printf("Entra la columna de la inicial de la paraula:\n");
-        fgets(input, 50, stdin);
-        while(sscanf(input, "%d", &columna) != 1 || columna < 1 || columna > s->dim)
-        {
-            printf("El valor indicat es incorrecte. Introdueix un nombre de 1 a %d\n", s->dim);
-            fgets(input, 50, stdin);
-        };
+        int posicio = (fila - 1) * s->dim + (columna - 1);
+        int pos_actual, increment, j, fila_actual, fila_paraula;
 
-        printf("Entra la direccio de la paraula (1: dreta, -1: esquerra, 2: baix, -2: dalt):\n");
-        fgets(input, 50, stdin);
-        while(sscanf(input, "%d", &direccio) != 1 || direccio != 1 && direccio != -1 && direccio != 2 && direccio != -2)
-        {
-            printf("El valor indicat es incorrecte. Introdueix una direccio valida (1: dreta, -1: esquerra, 2: baix, -2: dalt):\n");
-            fgets(input, 50, stdin);
-        };
-
-        // Comprovar si la paraula és correcta
-        int posicio = (fila - 1) * s->dim + (columna - 1); // Calcula la posicio en la taula
-        int num_lletres = strlen(s->par[nparaula].ll); // Calcula el num de lletres de la paraula en la posició indicada
-
-        if (direccio == 1) // Dreta
-        {
-            int pos_final = posicio + num_lletres - 1; // Calcula la posicio final
-            if (s->lletres[posicio] == s->par[nparaula].ll[0])
-            {
-                int i;
-                if (posicio == (pos_final - num_lletres + 1))
-                {
-                    s->par[nparaula].enc = true;
-                    // printf("%d, %d\n", posicio, pos_final); //Comprovar posicio i posicio final
-                    for (i = posicio; i <= pos_final; i++)
-                    {
-                        s->encertades[i] = true;
+            for (int i = 0; i < s->n_par && !trobat; i++) {
+                if (!s->par[i].enc) {
+                    switch (direccio) {
+                        case 1: // Dreta
+                            pos_actual = posicio;
+                            increment = 1;
+                            j = 0;
+                            break;
+                        case -1: // Esquerra
+                            pos_actual = posicio - 1;
+                            increment = -1;
+                            j = 1;
+                            break;
+                        case 2: // Baix
+                            pos_actual = posicio + s->dim;
+                            increment = s->dim;
+                            j = 1;
+                            break;
+                        case -2: // Dalt
+                            pos_actual = posicio - s->dim;
+                            increment = -s->dim;
+                            j = 1;
+                            break;
                     }
-                    printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
-                    s->n_encerts += 1;
-                }
-                else
-                {
-                    printf("La paraula introduida es incorrecta.\n");
-                }
-            }
-            else
-            {
-                printf("La paraula introduida es incorrecta. (1)\n");
-            }
-        }
-        else if (direccio == -1) // Esquerra
-        {
-            int pos_final = posicio - (num_lletres - 1); // Calcula la posicio final
-            if (s->lletres[posicio] == s->par[nparaula].ll[0])
-            {
-                int i;
-                if (posicio == (pos_final + num_lletres - 1))
-                {
-                    s->par[nparaula].enc = true;
-                    for (i = posicio; i >= pos_final; i--)
-                    {
-                        s->encertades[i] = true;
+
+                    while (pos_actual >= 0 && pos_actual < s->dim * s->dim && j < strlen(s->par[i].ll) && !trobat) {
+                        if (s->lletres[pos_actual] == s->par[i].ll[j]) {
+                            if (j == strlen(s->par[i].ll) - 1) {
+                                s->par[i].enc = true;
+                                printf("Has trobat la paraula '%s'!\n", s->par[i].ll);
+                                s->n_encerts += 1;
+                                trobat = true;
+                            }
+                            j++;
+                            pos_actual += increment;
+                        } else {
+                            pos_actual = -1; // Per sortir del bucle while
+                        }
                     }
-                    printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
-                    s->n_encerts += 1;
-                }
-                else
-                {
-                    printf("La paraula introduida es incorrecta.\n");
-                }
-            }
-            else
-            {
-                printf("La paraula introduida es incorrecta. (-1)\n");
-            }
-        }
-        else if (direccio == 2) // Baix.
-        {
-            int pos_final = posicio + (num_lletres - 1) * s->dim; // Calcula la posicio final
-              if (s->lletres[posicio] == s->par[nparaula].ll[0])
-            {
-                int i;
-                if (posicio == (pos_final - (num_lletres-1) * s->dim))
-                {
-                    s->par[nparaula].enc = true;
-                    for (i = 0 ; i < num_lletres; i++)
-                    {
-                        s->encertades[posicio + (i * s->dim)] = true;
+
+
+                    if (trobat) {
+                        for (int k = 0; k < j; k++) { // Bucle per a donar el color de les acertades.
+                            pos_actual -= increment;
+                            s->encertades[pos_actual] = true;
+                        }
                     }
-                    printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
-                    s->n_encerts += 1;
                 }
-                else
+                else if (s->par[i].enc)
                 {
-                    printf("La paraula introduida es incorrecta.\n");
+                    printf("Ja has trobat aquesta! ");
                 }
             }
-            else
-            {
-                printf("La paraula introduida es incorrecta. (2)\n");
-            }
-        }
-        else if (direccio == -2) // Dalt
-        {
-            int pos_final = posicio - (num_lletres - 1) * s->dim; // Calcula la posicio final
-            if (s->lletres[posicio] == s->par[nparaula].ll[0])
-            {
-                int i;
-                if (posicio == (pos_final + (num_lletres-1) * s->dim))
-                {
-                    s->par[nparaula].enc = true;
-                    for (i = 0 ; i < num_lletres; i++)
-                    {
-                        s->encertades[posicio - (i * s->dim)] = true;
-                    }
-                    printf("Has trobat la paraula '%s'!\n", s->par[nparaula].ll);
-                    s->n_encerts += 1;
-                }
-                else
-                {
-                    printf("La paraula introduida es incorrecta.\n");
-                }
-            }
-            else
-            {
-                printf("La paraula introduida es incorrecta. (-2)\n");
-            }
-        }
-        else
-        {
-            printf("Direccio invalida.\n");
+
+        if (!trobat) {
+            printf("La paraula introduida es invalida.\n");
         }
     }
     else if (strcmp(resposta, "N") == 0 || strcmp(resposta, "n") == 0)
@@ -532,7 +413,7 @@ void trobar_paraula (sopa_t *s)
 
         printf("No has trobat cap paraula en aquest torn. Et rendeixes o continues? (Introduir RENDICIO/CONTINUAR).\n");
         scanf("%s", resposta);
-        while((strcmp(resposta, "CONTINAR") != 0 && strcmp(resposta, "continuar") != 0) && (strcmp(resposta, "RENDICIO") != 0 && strcmp(resposta, "rendicio") != 0))
+        while((strcmp(resposta, "CONTINUAR") != 0 && strcmp(resposta, "continuar") != 0) && (strcmp(resposta, "RENDICIO") != 0 && strcmp(resposta, "rendicio") != 0))
         {
             printf("Resposta invalida.\n");
             printf("Torna a introduir la teva resposta. Et rendeixes o continues? (Introduir RENDICIO/CONTINUAR).\n");
@@ -552,7 +433,7 @@ void trobar_paraula (sopa_t *s)
                 int num_lletres = strlen(s->par[i].ll);
                 int pos_inicial = s->par[i].pos;
 
-                for (int j = 0; j < num_lletres; j++)
+                for (int j = 0; j < num_lletres; j++) // Bucle for per anar colorint les lletres de totes les paraules
                 {
                     int posicio;
                     switch(s->par[i].direccio)
